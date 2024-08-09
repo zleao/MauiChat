@@ -87,7 +87,12 @@
                         GroupHeaderTemplate="{StaticResource MessageGroupHeaderTemplate}"
                         ItemTemplate="{StaticResource MessageTemplateSelector}"
                         ItemsUpdatingScrollMode="KeepLastItemInView"
-                        Grid.Row="0"/>
+                        Grid.Row="0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="5" />
+            </CollectionView.ItemsLayout>
+        </CollectionView>
 
         <!-- GoToBottom Button -->
         <ImageButton Grid.Row="0"

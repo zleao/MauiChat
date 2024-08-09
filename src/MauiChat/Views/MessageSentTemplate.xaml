@@ -5,8 +5,7 @@
       xmlns:converters="clr-namespace:MauiChat.Converters"
       xmlns:m="clr-namespace:MauiChat.Models"
       x:DataType="m:MessageItem"
-      ColumnDefinitions=".2*,.8*,15"
-      Margin="0,0,0,5">
+      ColumnDefinitions=".2*,.8*,15">
 
     <Grid.Resources>
 
