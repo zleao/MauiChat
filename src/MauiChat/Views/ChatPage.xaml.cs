@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-
-namespace MauiChat.Views;
+﻿namespace MauiChat.Views;
 
 public partial class ChatPage : ContentPage
 {
@@ -19,12 +17,12 @@ public partial class ChatPage : ContentPage
 
     private void MessagesList_Scrolled(object? sender, ItemsViewScrolledEventArgs e)
     {
-        ButtonScrollToBottom.IsVisible = e.LastVisibleItemIndex != ViewModel.GroupedMessagesIndexCount;
+        ButtonScrollToBottom.IsVisible = e.LastVisibleItemIndex != ViewModel.GroupedMessages.Count - 1;
     }
 
     private void ButtonScrollToBottom_Clicked(object sender, EventArgs e)
     {
-        MessagesList.ScrollTo(ViewModel.GroupedMessagesIndexCount);
+        MessagesList.ScrollTo(ViewModel.GroupedMessages.Count - 1);
     }
 
     private void EntryFocused(object sender, FocusEventArgs e)

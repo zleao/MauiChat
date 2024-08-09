@@ -1,11 +1,6 @@
 ﻿namespace MauiChat.Models;
 
-public class MessageGroup : ObservableCollection<MessageItem>
+public class MessageGroup(string name)
 {
-    public string Name { get; private set; }
-
-    public MessageGroup(string name, List<MessageItem> messages) : base(messages)
-    {
-        Name = name;
-    }
+    public string Name { get; } = name;
 }

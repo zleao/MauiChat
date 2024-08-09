@@ -63,7 +63,6 @@
         <DataTemplate x:Key="MessageGroupHeaderTemplate">
             <v:MessageGroupHeaderTemplate/>
         </DataTemplate>
-
         <DataTemplate x:Key="MessageSentTemplate">
             <v:MessageSentTemplate/>
         </DataTemplate>
@@ -71,6 +70,7 @@
             <v:MessageReceivedTemplate/>
         </DataTemplate>
         <v:MessageTemplateSelector x:Key="MessageTemplateSelector"
+                                   GroupHeader="{StaticResource MessageGroupHeaderTemplate}"
                                    MessageSent="{StaticResource MessageSentTemplate}"
                                    MessageReceived="{StaticResource MessageReceivedTemplate}" />
         
@@ -83,8 +83,6 @@
         <!-- Messages List -->
         <CollectionView x:Name="MessagesList" 
                         ItemsSource="{Binding GroupedMessages}"
-                        IsGrouped="True"
-                        GroupHeaderTemplate="{StaticResource MessageGroupHeaderTemplate}"
                         ItemTemplate="{StaticResource MessageTemplateSelector}"
                         ItemsUpdatingScrollMode="KeepLastItemInView"
                         Grid.Row="0">

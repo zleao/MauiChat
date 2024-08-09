@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using zoft.MauiExtensions.Core.Extensions;
 
 namespace MauiChat.ViewModels;
 
@@ -17,9 +17,7 @@ public partial class ChatViewModel : ObservableObject
     /// Collection of grouped messages.
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<MessageGroup> _groupedMessages = [];
-
-    public int GroupedMessagesIndexCount => GroupedMessages.Sum(x => x.Count) + GroupedMessages.Count - 1;
+    private ObservableCollection<object> _groupedMessages = [];
 
     /// <summary>
     /// Indicates whether a message is being sent.
@@ -79,10 +77,18 @@ public partial class ChatViewModel : ObservableObject
     {
         var messages = ChatService.GetInitialMessages();
 
-        GroupedMessages = new ObservableCollection<MessageGroup>(
-            messages.GroupBy(m => m.Created.Date)
-                    .OrderBy(g => g.Key)
-                    .Select(messages => new MessageGroup(GetGroupHeaderName(messages.Key), [.. messages])));
+        var groupedMessages = messages.GroupBy(m => m.Created.Date)
+                                      .OrderBy(g => g.Key);
+
+        var messagesToShow = new ObservableCollection<object>();
+
+        foreach (var group in groupedMessages)
+        {
+            messagesToShow.Add(new MessageGroup(GetGroupHeaderName(group.Key)));
+            messagesToShow.AddRange(group.Select(m => m));
+        }
+
+        GroupedMessages = messagesToShow;
     }
 
     /// <summary>
@@ -207,14 +213,13 @@ public partial class ChatViewModel : ObservableObject
     /// <param name="newMessage">The new message to add.</param>
     private void AddMessageToList(MessageItem newMessage)
     {
-        if (GroupedMessages.Last().First().Created.Date == newMessage.Created.Date)
+        if (GroupedMessages.LastOrDefault(m => m is MessageGroup) is not MessageGroup lastGroup ||
+                lastGroup.Name != GetGroupHeaderName(newMessage.Created))
         {
-            GroupedMessages.Last().Add(newMessage);
+            GroupedMessages.Add(new MessageGroup(GetGroupHeaderName(newMessage.Created)));
         }
-        else
-        {
-            GroupedMessages.Add(new MessageGroup(GetGroupHeaderName(newMessage.Created.Date), [newMessage]));
-        }
+
+        GroupedMessages.Add(newMessage);
     }
 
     public ChatViewModel()
