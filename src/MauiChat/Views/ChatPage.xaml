@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:root="clr-namespace:MauiChat"
+			 xmlns:vm="clr-namespace:MauiChat.ViewModels"
+			 xmlns:m="clr-namespace:MauiChat.Models"
+             xmlns:v="clr-namespace:MauiChat.Views"
+			 x:Class="MauiChat.Views.ChatPage"
+			 x:DataType="vm:ChatViewModel"
+             x:Name="self">
+
+    <ContentPage.Resources>
+
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotNullOrEmptyConverter" />
+
+        <x:Double x:Key="FontIconDefaultSize">18</x:Double>
+        <Color x:Key="FontIconDefaultColor">#3E6787</Color>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HeightRequest" Value="30" />
+            <Setter Property="WidthRequest" Value="30" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style x:Key="SendButtonStyle" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="Green" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="WidthRequest" Value="40" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+        </Style>
+
+        <Style x:Key="ActivityIndicatorStyle" TargetType="ActivityIndicator">
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="HeightRequest" Value="20" />
+            <Setter Property="WidthRequest" Value="20" />
+            <Setter Property="Margin" Value="10,10,16,10" />
+        </Style>
+
+        <Style x:Key="ScrollToBottomImageButtonStyle" TargetType="ImageButton">
+            <Setter Property="CornerRadius" Value="25" />
+            <Setter Property="HeightRequest" Value="50" />
+            <Setter Property="WidthRequest" Value="50" />
+            <Setter Property="VerticalOptions" Value="End" />
+            <Setter Property="HorizontalOptions" Value="End" />
+            <Setter Property="BackgroundColor" Value="ForestGreen" />
+            <Setter Property="Margin" Value="0,0,20,20" />
+            <Setter Property="IsVisible" Value="false" />
+            <Setter Property="Shadow">
+                <Shadow Brush="Black"
+                        Offset="5,5"
+                        Radius="25"
+                        Opacity="0.8"/>
+            </Setter>
+        </Style>
+
+
+        <DataTemplate x:Key="MessageGroupHeaderTemplate">
+            <v:MessageGroupHeaderTemplate/>
+        </DataTemplate>
+        <DataTemplate x:Key="MessageSentTemplate">
+            <v:MessageSentTemplate/>
+        </DataTemplate>
+        <DataTemplate x:Key="MessageReceivedTemplate">
+            <v:MessageReceivedTemplate/>
+        </DataTemplate>
+        <v:MessageTemplateSelector x:Key="MessageTemplateSelector"
+                                   GroupHeader="{StaticResource MessageGroupHeaderTemplate}"
+                                   MessageSent="{StaticResource MessageSentTemplate}"
+                                   MessageReceived="{StaticResource MessageReceivedTemplate}" />
+        
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto,Auto"
+          RowSpacing="6"
+          Margin="0,0,0,6">
+
+        <!-- Messages List -->
+        <CollectionView x:Name="MessagesList" 
+                        ItemsSource="{Binding GroupedMessages}"
+                        ItemTemplate="{StaticResource MessageTemplateSelector}"
+                        ItemsUpdatingScrollMode="KeepLastItemInView"
+                        Grid.Row="0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="5" />
+            </CollectionView.ItemsLayout>
+        </CollectionView>
+
+        <!-- GoToBottom Button -->
+        <ImageButton Grid.Row="0"
+                     Style="{StaticResource ScrollToBottomImageButtonStyle}"
+                     Clicked="ButtonScrollToBottom_Clicked"
+                     x:Name="ButtonScrollToBottom">
+            <ImageButton.Source>
+                <FontImageSource FontFamily="{x:Static root:IconFontFamily.MaterialIcons}"
+                                 Glyph="{x:Static root:IconFontGlyph.Keyboard_double_arrow_down}"
+                                 Size="{StaticResource FontIconDefaultSize}"/>
+            </ImageButton.Source>
+        </ImageButton>
+
+        <!-- Message Input -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,Auto"
+              IsEnabled="{Binding IsSendingMessage, Converter={StaticResource InvertedBoolConverter}}">
+
+            <Border Grid.Column="0"
+                    StrokeShape="RoundRectangle 20"
+                    Margin="6">
+                <Grid ColumnDefinitions="*,Auto,Auto"
+                      ColumnSpacing="6"
+                      Margin="6,0,6,0">
+
+                    <Editor Grid.Column="0"
+                            Placeholder="Write your message..."
+                            Text="{Binding MessageBody, Mode=TwoWay}"
+                            AutoSize="TextChanges"
+                            MaximumHeightRequest="100"
+                            VerticalOptions="Center"/>
+
+                    <Button Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding TakePhotoCommand}"
+                            IsVisible="{Binding IsTyping, Converter={StaticResource InvertedBoolConverter}}"
+                            Grid.Column="1">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="{x:Static root:IconFontFamily.MaterialIcons}"
+                                             Glyph="{x:Static root:IconFontGlyph.Photo_camera}"
+                                             Size="{StaticResource FontIconDefaultSize}"
+                                             Color="{StaticResource FontIconDefaultColor}"/>
+                        </Button.ImageSource>
+                    </Button>
+
+                    <Button Style="{StaticResource ActionButtonStyle}"
+                            Command="{Binding PickPhotoCommand}"
+                            IsVisible="{Binding IsTyping, Converter={StaticResource InvertedBoolConverter}}"
+                            Grid.Column="2">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="{x:Static root:IconFontFamily.MaterialIcons}"
+                                             Glyph="{x:Static root:IconFontGlyph.Image}"
+                                             Size="{StaticResource FontIconDefaultSize}"
+                                             Color="{StaticResource FontIconDefaultColor}"/>
+                        </Button.ImageSource>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Button Style="{StaticResource SendButtonStyle}"
+                    Command="{Binding SendMessageCommand}"
+                    IsVisible="{Binding IsSendingMessage, Converter={StaticResource InvertedBoolConverter}}"
+                    Grid.Column="1">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="{x:Static root:IconFontFamily.MaterialIcons}"
+                                     Glyph="{x:Static root:IconFontGlyph.Send}"
+                                     Size="24"/>
+                </Button.ImageSource>
+            </Button>
+
+            <ActivityIndicator Style="{StaticResource ActivityIndicatorStyle}"
+                               IsVisible="{Binding IsSendingMessage}"
+                               IsRunning="True"
+                               Grid.Column="1" />
+        </Grid>
+
+        <!-- Attachments List -->
+        <Grid Grid.Row="2" RowDefinitions="Auto"
+              IsEnabled="{Binding IsSendingMessage, Converter={StaticResource InvertedBoolConverter}}"
+              IsVisible="{Binding MessageAttachments, Converter={StaticResource IsListNotNullOrEmptyConverter}}"
+              MaximumHeightRequest="150">
+            <ScrollView VerticalOptions="Fill" HorizontalOptions="Fill" HeightRequest="150">
+                <FlexLayout BindableLayout.ItemsSource="{Binding MessageAttachments}"
+                            Style="{StaticResource FlexLayoutImageContainerStyle}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="m:MediaItem">
+                            <Image Source="{Binding Source}"
+                                   Style="{StaticResource ImageStyle}">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={Reference self},
+                                                                    Path=BindingContext.RemoveAttachmentCommand}" 
+                                                          CommandParameter="{Binding .}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+            </ScrollView>
+            
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

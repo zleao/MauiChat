@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+      x:Class="MauiChat.Views.MessageReceivedTemplate"
+      xmlns:converters="clr-namespace:MauiChat.Converters"
+      xmlns:m="clr-namespace:MauiChat.Models"
+      x:DataType="m:MessageItem"
+      ColumnDefinitions="10,.8*,.2*">
+
+    <Grid.Resources>
+
+        <converters:MessageDateConverter x:Key="MessageDateConverter" />
+        
+        <Color x:Key="PeerMessageBackgroundColor">#DDDDDD</Color>
+        <Color x:Key="MessagesTextColor">#DE000000</Color>
+        
+    </Grid.Resources>
+
+    <Grid Grid.Column="0"
+          Margin="0,0,0,5"
+          VerticalOptions="End">
+        
+        <Polygon Points="0,10 10,0 10,20"
+                 StrokeThickness="0"
+                 Fill="{StaticResource PeerMessageBackgroundColor}" />
+    </Grid>
+
+    <Border Grid.Column="1"
+            StrokeShape="RoundRectangle 5"
+            StrokeThickness="0"
+            BackgroundColor="{StaticResource PeerMessageBackgroundColor}">
+        
+        <Grid RowDefinitions="Auto,Auto,Auto"
+              ColumnDefinitions="*,Auto"
+              Padding="10,5,5,5">
+
+            <Label Text="Another person"
+                   TextColor="{StaticResource MessagesTextColor}"
+                   Grid.Row="0"
+                   FontAttributes="Bold" />
+
+            <Grid Grid.Row="1"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="6">
+                
+                <Label Text="{Binding Body}"
+                       TextColor="{DynamicResource MessagesTextColor}"
+                       Grid.Row="0"/>
+
+                <FlexLayout BindableLayout.ItemsSource="{Binding Attachments}"
+                            Grid.Row="1"
+                            Style="{StaticResource FlexLayoutImageContainerStyle}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="m:MediaItem">
+                            <Image Source="{Binding Source}" Style="{StaticResource ImageSmallStyle}" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+            </Grid>
+
+            <Label Grid.Row="2"
+                   Grid.Column="1"
+                   Text="{Binding Created, Converter={StaticResource MessageDateConverter}}"
+                   TextColor="{DynamicResource MessagesTextColor}"/>
+        </Grid>
+    </Border>
+
+</Grid>
