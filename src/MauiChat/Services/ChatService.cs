@@ -1,6 +1,6 @@
 ﻿namespace MauiChat.Services;
 
-public class ChatService
+public static class ChatService
 {
     public static IEnumerable<MessageItem> GetInitialMessages()
 	{

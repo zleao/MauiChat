@@ -2,77 +2,29 @@
 
 namespace MauiChat.ViewModels;
 
-/// <summary>
-/// ViewModel for managing chat functionalities.
-/// </summary>
 public partial class ChatViewModel : ObservableObject
 {
-    /// <summary>
-    /// Indicates whether the chat is refreshing.
-    /// </summary>
     [ObservableProperty]
     private bool _isRefreshing;
 
-    /// <summary>
-    /// Collection of grouped messages.
-    /// </summary>
     [ObservableProperty]
     private ObservableCollection<object> _groupedMessages = [];
 
-    /// <summary>
-    /// Indicates whether a message is being sent.
-    /// </summary>
     [ObservableProperty]
     private bool _isSendingMessage;
+    partial void OnIsSendingMessageChanged(bool value) => SendMessageCommand.NotifyCanExecuteChanged();
 
-    /// <summary>
-    /// Called when the IsSendingMessage property changes.
-    /// </summary>
-    /// <param name="value">The new value of the IsSendingMessage property.</param>
-    partial void OnIsSendingMessageChanged(bool value)
-    {
-        SendMessageCommand.NotifyCanExecuteChanged();
-    }
-
-    /// <summary>
-    /// Indicates whether the user is typing a message.
-    /// </summary>
     [ObservableProperty]
     private bool _isTyping;
 
-    /// <summary>
-    /// The body of the message being composed.
-    /// </summary>
     [ObservableProperty]
     private string _messageBody = string.Empty;
+    partial void OnMessageBodyChanged(string value) => SendMessageCommand.NotifyCanExecuteChanged();
 
-    /// <summary>
-    /// Called when the MessageBody property changes.
-    /// </summary>
-    /// <param name="value">The new value of the MessageBody property.</param>
-    partial void OnMessageBodyChanged(string value)
-    {
-        SendMessageCommand.NotifyCanExecuteChanged();
-    }
-
-    /// <summary>
-    /// Collection of message attachments.
-    /// </summary>
     [ObservableProperty]
     private ObservableCollection<MediaItem> _messageAttachments = [];
+    partial void OnMessageAttachmentsChanged(ObservableCollection<MediaItem> value) => SendMessageCommand.NotifyCanExecuteChanged();
 
-    /// <summary>
-    /// Called when the MessageAttachments property changes.
-    /// </summary>
-    /// <param name="value">The new value of the MessageAttachments property.</param>
-    partial void OnMessageAttachmentsChanged(ObservableCollection<MediaItem> value)
-    {
-        SendMessageCommand.NotifyCanExecuteChanged();
-    }
-
-    /// <summary>
-    /// Loads the initial set of messages.
-    /// </summary>
     public void LoadInitialMessages()
     {
         var messages = ChatService.GetInitialMessages();
@@ -91,11 +43,6 @@ public partial class ChatViewModel : ObservableObject
         GroupedMessages = messagesToShow;
     }
 
-    /// <summary>
-    /// Gets the header name for a group of messages based on the date.
-    /// </summary>
-    /// <param name="value">The date of the messages.</param>
-    /// <returns>The header name for the group.</returns>
     private static string GetGroupHeaderName(DateTime value)
     {
         if (value is DateTime date)
@@ -122,10 +69,6 @@ public partial class ChatViewModel : ObservableObject
         return null;
     }
 
-    /// <summary>
-    /// Command to take a photo and add it as a message attachment.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [RelayCommand]
     public async Task TakePhoto()
     {
@@ -137,10 +80,6 @@ public partial class ChatViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Command to pick a photo and add it as a message attachment.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [RelayCommand]
     public async Task PickPhoto()
     {
@@ -152,10 +91,6 @@ public partial class ChatViewModel : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Command to send a message.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [RelayCommand(CanExecute = nameof(CanSendMessage))]    public async Task SendMessage()
     {
         // Check if the message can be sent
@@ -196,9 +131,6 @@ public partial class ChatViewModel : ObservableObject
             IsSendingMessage = false;
         }
     }
-    /// <summary>
-    /// Determines whether a message can be sent.
-    /// </summary>
     public bool CanSendMessage => !IsSendingMessage && (!string.IsNullOrWhiteSpace(MessageBody) || MessageAttachments.Any());
 
     [RelayCommand]
